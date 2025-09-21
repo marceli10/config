@@ -1,5 +1,6 @@
 return {
 	"nvimtools/none-ls.nvim",
+    enabled = true,
 	dependencies = {
 		"nvimtools/none-ls-extras.nvim",
 	},
@@ -17,6 +18,6 @@ return {
 			},
 		})
 
-		vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "Code [F]ormat" })
+	 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "Code [F]ormat" })
 	end,
 }

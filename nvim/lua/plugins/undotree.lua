@@ -1,9 +1,10 @@
 return {
   "mbbill/undotree",
-  config = function()
-	  vim.keymap.set("n", "<leader>u", function()
-		  vim.cmd.UndotreeToggle()
-		  vim.cmd("wincmd p")
-	  end, { desc = "Toggle Undotree" })
-  end,
+  cmd = "UndotreeToggle",
+  keys = {
+    { "<C-u>", "<cmd>UndotreeToggle<CR>", desc = "Toggle [U]ndotree" },
+  },
+  init = function()
+    vim.g.undotree_WindowLayout = 4
+  end
 }

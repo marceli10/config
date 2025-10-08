@@ -1,130 +1,132 @@
-return {
-    {
-        'mason-org/mason.nvim',
-        opts = {},
-    },
+return {}
 
-    -- mason lsp config ensures lsp servers are inttalled
-    {
-        'mason-org/mason-lspconfig.nvim',
-        opts = {
-            ensure_installed = {
-                'lua_ls',
-                'ts_ls',
-                'html',
-                'postgres_lsp',
-                'pyright',
-                'vimls',
-                'cssls',
-                'jdtls',
-            },
-            -- automatic_enable = {
-            -- 	exclude = { "jdtls" },
-            -- },
-        },
-        dependencies = {
-            { 'mason-org/mason.nvim', opts = {} },
-            'neovim/nvim-lspconfig',
-        },
-    },
-
-    -- mason nvim dap
-    {
-        'jay-babu/mason-nvim-dap.nvim',
-        opts = {
-            ensure_instaled = {
-                'java-debug-adapter',
-                'java-test',
-            },
-        },
-    },
-
-    -- utility plugin for lsp configuration
-    {
-        'mfussenegger/nvim-jdtls',
-        dependencies = {
-            'mfussenegger/nvim-dap',
-        },
-        ft = { 'java' },
-        config = function()
-            local jdtls = require 'jdtls'
-            local home = os.getenv 'HOME'
-            local workspace_dir = home .. '/.local/share/eclipse/' .. vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')
-
-            local config = {
-                cmd = { 'jdtls', '-data', workspace_dir },
-                root_dir = require('jdtls.setup').find_root { 'gradlew', 'mvnw', '.git' },
-                init_options = {
-                    bundles = {}, -- debug jars if needed
-                },
-            }
-
-            jdtls.start_or_attach(config)
-
-            local opts = { silent = true, buffer = 0 }
-
-            -- Java specific actions
-            vim.keymap.set('n', '<leader>oi', jdtls.organize_imports, opts)
-            vim.keymap.set('n', '<leader>ev', jdtls.extract_variable, opts)
-            vim.keymap.set('n', '<leader>ec', jdtls.extract_constant, opts)
-            vim.keymap.set('n', '<leader>em', jdtls.extract_method, opts)
-
-            -- Create new types
-            vim.keymap.set('n', '<leader>jc', jdtls.new_class, { desc = 'New Java Class', buffer = 0 })
-            vim.keymap.set('n', '<leader>ji', jdtls.new_interface, { desc = 'New Java Interface', buffer = 0 })
-            vim.keymap.set('n', '<leader>je', jdtls.new_enum, { desc = 'New Java Enum', buffer = 0 })
-            vim.keymap.set('n', '<leader>jr', jdtls.new_record, { desc = 'New Java Record', buffer = 0 })
-        end,
-    },
-
-    {
-        'MeanderingProgrammer/render-markdown.nvim',
-        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-        opts = {
-            file_types = { 'markdown' },
-        },
-    },
-
-    {
-        'neovim/nvim-lspconfig',
-        config = function()
-            local lspconfig = require 'lspconfig'
-
-            local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
-            -- setup the lua language server
-            lspconfig.lua_ls.setup {
-                capabilities = capabilities,
-            }
-
-            -- setup the typescript language server
-            lspconfig.ts_ls.setup {
-                capabilities = capabilities,
-            }
-
-            vim.keymap.set('n', 'K', vim.lsp.buf.hover, { desc = 'Code [K]over Documentation' })
-
-            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Code [G]oto [D]efinition' })
-
-            vim.keymap.set({ 'n', 'v' }, '<C-a>', vim.lsp.buf.code_action, { desc = '[Crtl]ode [A]ctions' })
-
-            vim.keymap.set(
-                'n',
-                'gr',
-                require('telescope.builtin').lsp_references,
-                { desc = 'Code [G]oto [R]eferences' }
-            )
-
-            vim.keymap.set(
-                'n',
-                'gi',
-                require('telescope.builtin').lsp_implementations,
-                { desc = 'Code [G]oto [I]mplementations' }
-            )
-
-            vim.keymap.set('n', 'rn', vim.lsp.buf.rename, { desc = 'Code [R]e[N]ame' })
-
-            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { desc = 'Code [G]oto [D]eclaration' })
-        end,
-    },
-}
+-- return {
+--     {
+--         'mason-org/mason.nvim',
+--         opts = {},
+--     },
+--
+--     -- mason lsp config ensures lsp servers are inttalled
+--     {
+--         'mason-org/mason-lspconfig.nvim',
+--         opts = {
+--             ensure_installed = {
+--                 'lua_ls',
+--                 'ts_ls',
+--                 'html',
+--                 'postgres_lsp',
+--                 'pyright',
+--                 'vimls',
+--                 'cssls',
+--                 'jdtls',
+--             },
+--             -- automatic_enable = {
+--             -- 	exclude = { "jdtls" },
+--             -- },
+--         },
+--         dependencies = {
+--             { 'mason-org/mason.nvim', opts = {} },
+--             'neovim/nvim-lspconfig',
+--         },
+--     },
+--
+--     -- mason nvim dap
+--     {
+--         'jay-babu/mason-nvim-dap.nvim',
+--         opts = {
+--             ensure_instaled = {
+--                 'java-debug-adapter',
+--                 'java-test',
+--             },
+--         },
+--     },
+--
+--     -- utility plugin for lsp configuration
+--     {
+--         'mfussenegger/nvim-jdtls',
+--         dependencies = {
+--             'mfussenegger/nvim-dap',
+--         },
+--         ft = { 'java' },
+--         config = function()
+--             local jdtls = require 'jdtls'
+--             local home = os.getenv 'HOME'
+--             local workspace_dir = home .. '/.local/share/eclipse/' .. vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')
+--
+--             local config = {
+--                 cmd = { 'jdtls', '-data', workspace_dir },
+--                 root_dir = require('jdtls.setup').find_root { 'gradlew', 'mvnw', '.git' },
+--                 init_options = {
+--                     bundles = {}, -- debug jars if needed
+--                 },
+--             }
+--
+--             jdtls.start_or_attach(config)
+--
+--             local opts = { silent = true, buffer = 0 }
+--
+--             -- Java specific actions
+--             vim.keymap.set('n', '<leader>oi', jdtls.organize_imports, opts)
+--             vim.keymap.set('n', '<leader>ev', jdtls.extract_variable, opts)
+--             vim.keymap.set('n', '<leader>ec', jdtls.extract_constant, opts)
+--             vim.keymap.set('n', '<leader>em', jdtls.extract_method, opts)
+--
+--             -- Create new types
+--             vim.keymap.set('n', '<leader>jc', jdtls.new_class, { desc = 'New Java Class', buffer = 0 })
+--             vim.keymap.set('n', '<leader>ji', jdtls.new_interface, { desc = 'New Java Interface', buffer = 0 })
+--             vim.keymap.set('n', '<leader>je', jdtls.new_enum, { desc = 'New Java Enum', buffer = 0 })
+--             vim.keymap.set('n', '<leader>jr', jdtls.new_record, { desc = 'New Java Record', buffer = 0 })
+--         end,
+--     },
+--
+--     {
+--         'MeanderingProgrammer/render-markdown.nvim',
+--         dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+--         opts = {
+--             file_types = { 'markdown' },
+--         },
+--     },
+--
+--     {
+--         'neovim/nvim-lspconfig',
+--         config = function()
+--             local lspconfig = require 'lspconfig'
+--
+--             local capabilities = require('cmp_nvim_lsp').default_capabilities()
+--
+--             -- setup the lua language server
+--             lspconfig.lua_ls.setup {
+--                 capabilities = capabilities,
+--             }
+--
+--             -- setup the typescript language server
+--             lspconfig.ts_ls.setup {
+--                 capabilities = capabilities,
+--             }
+--
+--             vim.keymap.set('n', 'K', vim.lsp.buf.hover, { desc = 'Code [K]over Documentation' })
+--
+--             vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Code [G]oto [D]efinition' })
+--
+--             vim.keymap.set({ 'n', 'v' }, '<C-a>', vim.lsp.buf.code_action, { desc = '[Crtl]ode [A]ctions' })
+--
+--             vim.keymap.set(
+--                 'n',
+--                 'gr',
+--                 require('telescope.builtin').lsp_references,
+--                 { desc = 'Code [G]oto [R]eferences' }
+--             )
+--
+--             vim.keymap.set(
+--                 'n',
+--                 'gi',
+--                 require('telescope.builtin').lsp_implementations,
+--                 { desc = 'Code [G]oto [I]mplementations' }
+--             )
+--
+--             vim.keymap.set('n', 'rn', vim.lsp.buf.rename, { desc = 'Code [R]e[N]ame' })
+--
+--             vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { desc = 'Code [G]oto [D]eclaration' })
+--         end,
+--     },
+-- }

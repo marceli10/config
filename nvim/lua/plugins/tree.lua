@@ -24,6 +24,7 @@ return {
                         folder = true,
                         folder_arrow = true,
                         git = true,
+                        dotfiles = true
                     },
                     glyphs = {
                         default = '', -- fallback icon

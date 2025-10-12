@@ -12,39 +12,13 @@ return {
             adapters = {
                 require 'neotest-jdtls',
             },
-
-            -- -- General neotest configuration
-            -- output = {
-            --     enabled = true,
-            --     open_on_run = 'short', -- "short" | "long" | false
-            -- },
-            --
-            -- -- Quickfix settings
-            -- quickfix = {
-            --     enabled = true,
-            --     open = false, -- open quickfix when tests fail
-            -- },
-            --
-            -- -- Status configuration
-            -- status = {
-            --     enabled = true,
-            --     virtual_text = true,
-            --     signs = true,
-            -- },
-            --
-            -- floating = {
-            --     border = 'rounded',
-            --     max_height = 0.9,
-            --     max_width = 0.9,
-            --     options = {},
-            -- },
         }
     end,
     keys = function()
         local neotest = require 'neotest'
 
         -- Test running keymaps
-        vim.keymap.set('n', '<leader>tn', function()
+        vim.keymap.set('n', '<leader>tr', function()
             neotest.run.run()
         end, { desc = 'Run nearest test' })
 
@@ -91,15 +65,14 @@ return {
             neotest.summary.toggle()
         end, { desc = 'Toggle test summary' })
 
-        -- Stop running tests
-        vim.keymap.set('n', '<leader>tS', function()
+        vim.keymap.set('n', '<leader>ts', function()
             neotest.run.stop()
         end, { desc = 'Stop running tests' })
 
         vim.keymap.set('n', '<leader>ta', function()
             neotest.run.run(vim.fn.getcwd())
         end, { desc = 'Run all tests in project' })
-        -- Watch tests (useful for TDD)
+
         vim.keymap.set('n', '<leader>tw', function()
             neotest.watch.toggle(vim.fn.expand '%')
         end, { desc = 'Watch current file for changes' })
@@ -111,12 +84,10 @@ return {
             neotest.output_panel.close()
         end, { desc = 'Clear and close all test windows' })
 
-        -- Additional useful mappings
         vim.keymap.set('n', '<leader>tm', function()
             neotest.run.run { suite = false, extra_args = { '--update-snapshots' } }
         end, { desc = 'Run tests with modified args' })
 
-        -- Show test status in statusline (optional)
         vim.keymap.set('n', '<leader>tq', function()
             local results = neotest.state.status_counts(vim.fn.expand '%')
             if results then

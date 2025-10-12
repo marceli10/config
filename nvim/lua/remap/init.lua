@@ -8,6 +8,18 @@ vim.keymap.set('i', 'jj', '<Esc>', { desc = 'Escape insert mode' })
 -- vim.keymap.set("n", "<C-s>", vim.cmd.w, { desc = "Save file" })
 -- vim.keymap.set("i", "<C-s>", vim.cmd.wa, { desc = "Save file in insert mode" })
 
+vim.keymap.set('n', '+', 'zO', { noremap = true, silent = true, desc = 'Open fold' })
+vim.keymap.set('n', '-', 'zc', { noremap = true, silent = true, desc = 'Fold text'})
+
+-- Use Tree-sitter for folding
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+
+-- Optional: start with folds open
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
+
 vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Move to left window' })
 vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Move to right window' })
 vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Move to window below' })

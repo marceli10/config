@@ -18,13 +18,12 @@ return {
             renderer = {
                 icons = {
                     webdev_colors = true, -- enable filetype icon colors
-                    git_placement = 'after', -- or "before"
+                    git_placement = 'before', -- or "after"
                     show = {
                         file = true,
                         folder = true,
                         folder_arrow = true,
                         git = true,
-                        dotfiles = true
                     },
                     glyphs = {
                         default = '', -- fallback icon

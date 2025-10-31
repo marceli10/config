@@ -1,5 +1,4 @@
-require("remap")
-require("config.lazy")
--- require("config.autocmds")
+require 'remap'
+require 'config.lazy'
 
-vim.cmd.colorscheme "catppuccin"
+vim.cmd.colorscheme 'catppuccin'

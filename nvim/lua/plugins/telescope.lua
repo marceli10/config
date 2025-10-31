@@ -1,9 +1,10 @@
 return {
     {
-        'nvim-telescope/telescope.nvim', tag = '0.1.8',
+        'nvim-telescope/telescope.nvim',
+        tag = '0.1.8',
         dependencies = { 'nvim-lua/plenary.nvim' },
         config = function()
-            local builtin = require('telescope.builtin')
+            local builtin = require 'telescope.builtin'
 
             vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[f]ind [h]elp' })
             vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = '[f]ind [k]eymaps' })
@@ -17,47 +18,53 @@ return {
             vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
             vim.keymap.set('n', '<leader>ff', function()
-            builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-              winblend = 10,
-              previewer = false,
-            })
-              end, { desc = '[f]uzzily [f]ind in current buffer' })
+                builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+                    winblend = 10,
+                    previewer = false,
+                })
+            end, { desc = '[f]uzzily [f]ind in current buffer' })
 
-              vim.keymap.set('n', '<leader>f/', function()
-            builtin.live_grep {
-              grep_open_files = true,
-              prompt_title = 'Live Grep in Open Files',
+            vim.keymap.set('n', '<leader>f/', function()
+                builtin.live_grep {
+                    grep_open_files = true,
+                    prompt_title = 'Live Grep in Open Files',
+                }
+            end, { desc = '[f]ind [/] in Open Files' })
+
+            -- Shortcut for searching your Neovim configuration files
+            vim.keymap.set('n', '<leader>fn', function()
+                builtin.find_files { cwd = vim.fn.stdpath 'config' }
+            end, { desc = '[f]ind [n]eovim files' })
+
+            require('telescope').setup {
+                defaults = {
+                    path_display = { 'truncate' },
+                },
             }
-              end, { desc = '[f]ind [/] in Open Files' })
-
-              -- Shortcut for searching your Neovim configuration files
-              vim.keymap.set('n', '<leader>fn', function()
-            builtin.find_files { cwd = vim.fn.stdpath 'config' }
-              end, { desc = '[f]ind [n]eovim files' })
-        end
+        end,
     },
     {
         'nvim-telescope/telescope-ui-select.nvim',
         config = function()
-            local actions = require("telescope.actions")
+            local actions = require 'telescope.actions'
 
-            require("telescope").setup({
+            require('telescope').setup {
                 extensions = {
-                    ["ui-select"] = {
-                        require("telescope.themes").get_dropdown {}
-                    }
+                    ['ui-select'] = {
+                        require('telescope.themes').get_dropdown {},
+                    },
                 },
                 mappings = {
                     i = {
-                        ["<C-n>"] = actions.cycle_history_next,
-                        ["<C-p>"] = actions.cycle_history_prev,
-                        ["<C-j>"] = actions.move_selection_next,
-                        ["<C-k>"] = actions.move_selection_previous,
-                    }
+                        ['<C-n>'] = actions.cycle_history_next,
+                        ['<C-p>'] = actions.cycle_history_prev,
+                        ['<C-j>'] = actions.move_selection_next,
+                        ['<C-k>'] = actions.move_selection_previous,
+                    },
                 },
 
-                require("telescope").load_extension("ui-select")
-            })
-        end
-    }
+                require('telescope').load_extension 'ui-select',
+            }
+        end,
+    },
 }

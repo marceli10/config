@@ -1,5 +1,13 @@
 local M = {}
 
+local function on_attach(client, bufnr)
+        vim.lsp.codelens.refresh()
+        vim.api.nvim_create_autocmd("BufWritePost", {
+            buffer = bufnr,
+            callback = vim.lsp.codelens.refresh,
+        })
+end
+
 function M:setup()
     local home = os.getenv 'HOME'
     local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')
@@ -63,7 +71,6 @@ function M:setup()
         settings = {
             java = {
                 signatureHelp = { enabled = true },
-                extendedClientCapabilities = extendedClientCapabilities,
                 maven = {
                     downloadSources = true,
                 },
@@ -72,6 +79,9 @@ function M:setup()
                 },
                 references = {
                     includeDecompiledSources = true,
+                },
+                implementationCodeLens = {
+                    enabled = true,
                 },
                 inlayHints = {
                     parameterNames = {
@@ -132,11 +142,13 @@ function M:setup()
             bundles = bundles,
             extendedClientCapabilities = extendedClientCapabilities,
         },
+        extendedClientCapabilities = extendedClientCapabilities,
         capabilities = require('cmp_nvim_lsp').default_capabilities(),
+        on_attach = on_attach,
     }
 
-    -- goto test
-    vim.keymap.set('n', 'gt', require('jdtls.tests').goto_subjects, { desc = "Go to test"})
+    vim.keymap.set('n', 'gt', require('jdtls.tests').goto_subjects, { desc = 'Go to test' })
+    vim.keymap.set('n', '<leader>jb', ':JdtBytecode<CR>', { desc = 'Show [j]ava [b]ytecode' })
 
     require('jdtls').start_or_attach(config)
 end

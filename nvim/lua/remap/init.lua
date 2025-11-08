@@ -42,6 +42,7 @@ vim.opt.undofile = true
 vim.opt.breakindent = true
 vim.opt.scrolloff = 20
 vim.g.have_nerd_font = true
+vim.opt.updatetime = 150  -- Trigger faster events
 
 vim.opt.swapfile = false
 vim.opt.backup = false

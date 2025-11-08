@@ -16,8 +16,7 @@ return {
                 'vimls',
                 'cssls',
                 'jdtls',
-                'gradle-language-server',
-
+                'gradle-ls',
             },
             automatic_enable = {
                 exclude = { 'jdtls' },

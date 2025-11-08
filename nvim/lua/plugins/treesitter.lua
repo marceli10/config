@@ -2,7 +2,7 @@ return {
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
         'windwp/nvim-ts-autotag', -- auto-closing the jsx tags
-   },
+    },
     build = ':TSUpdate',
     config = function()
         local ts_config = require 'nvim-treesitter.configs'

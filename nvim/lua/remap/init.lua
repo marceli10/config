@@ -9,11 +9,14 @@ vim.keymap.set('i', 'jj', '<Esc>', { desc = 'Escape insert mode' })
 -- vim.keymap.set("i", "<C-s>", vim.cmd.wa, { desc = "Save file in insert mode" })
 
 vim.keymap.set('n', '+', 'zO', { noremap = true, silent = true, desc = 'Open fold' })
-vim.keymap.set('n', '-', 'zc', { noremap = true, silent = true, desc = 'Fold text'})
+vim.keymap.set('n', '-', 'zc', { noremap = true, silent = true, desc = 'Fold text' })
+
+-- Inline diagnostic
+vim.diagnostic.config { virtual_text = true }
 
 -- Use Tree-sitter for folding
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 
 -- Optional: start with folds open
 vim.opt.foldlevel = 99
@@ -31,7 +34,7 @@ vim.keymap.set('n', '<leader>wv', ':vsplit<CR>', { desc = '[W]indow split [V]ert
 vim.keymap.set('n', '<leader>wh', ':split<CR>', { desc = '[W]indow split [H]orizontal' })
 
 vim.opt.laststatus = 3
-vim.opt.signcolumn = "yes:2"
+vim.opt.signcolumn = 'yes:2'
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
@@ -42,7 +45,7 @@ vim.opt.undofile = true
 vim.opt.breakindent = true
 vim.opt.scrolloff = 20
 vim.g.have_nerd_font = true
-vim.opt.updatetime = 150  -- Trigger faster events
+vim.opt.updatetime = 150 -- Trigger faster events
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -63,11 +66,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 --  Closing the git diff view
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "DiffviewFiles", "DiffviewFileHistory" },
-  callback = function()
-    vim.keymap.set("n", "q", "<cmd>DiffviewClose<CR>", { buffer = true, desc = "Close Diffview" })
-  end,
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'DiffviewFiles', 'DiffviewFileHistory' },
+    callback = function()
+        vim.keymap.set('n', 'q', '<cmd>DiffviewClose<CR>', { buffer = true, desc = 'Close Diffview' })
+    end,
 })
 
 -- Stay in visual mode after indentetion

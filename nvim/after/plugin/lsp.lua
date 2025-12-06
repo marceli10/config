@@ -1,5 +1,5 @@
 local function lsp_highlight_document(client)
-    if client.resolved_capabilities.document_highlight then
+    if client.server_capabilities.documentHighlightProvider then
         vim.api.nvim_exec(
             [[
             augroup lsp_document_highlight
@@ -132,7 +132,7 @@ local servers = {
     'pyright',
     'vimls',
     'cssls',
-    'gradle_ls',
+    'gradle_ls'
 }
 
 vim.lsp.enable(servers)

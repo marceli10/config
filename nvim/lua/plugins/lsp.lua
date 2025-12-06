@@ -17,6 +17,7 @@ return {
                 'cssls',
                 'jdtls',
                 'gradle-ls',
+                'pyright'
             },
             automatic_enable = {
                 exclude = { 'jdtls' },

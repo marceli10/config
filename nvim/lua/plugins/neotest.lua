@@ -16,22 +16,19 @@ return {
             'nvim-lua/plenary.nvim',
             'antoinemadec/FixCursorHold.nvim',
             'nvim-treesitter/nvim-treesitter',
-            'atm1020/neotest-jdtls',
-            'mfussenegger/nvim-jdtls',
-            'mfussenegger/nvim-dap',
             'rcarriga/nvim-dap-ui',
             'theHamsta/nvim-dap-virtual-text',
+            'nvim-neotest/neotest-python',
+            'nvim-neotest/neotest-jest',
         },
         config = function()
             require('neotest').setup {
                 log_level = vim.log.levels.TRACE,
 
                 adapters = {
-                    -- require 'neotest-java' {
-                    --     ignore_wrapper = false,
-                    --     junit_jar = nil,
-                    -- },
-                    require 'neotest-jdtls',
+                    require 'neotest-java' {},
+                    require 'neotest-python',
+                    require 'neotest-jest',
                 },
             }
         end,

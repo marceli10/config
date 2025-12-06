@@ -1,11 +1,11 @@
 local M = {}
 
 local function on_attach(client, bufnr)
-        vim.lsp.codelens.refresh()
-        vim.api.nvim_create_autocmd("BufWritePost", {
-            buffer = bufnr,
-            callback = vim.lsp.codelens.refresh,
-        })
+    vim.lsp.codelens.refresh()
+    vim.api.nvim_create_autocmd('BufWritePost', {
+        buffer = bufnr,
+        callback = vim.lsp.codelens.refresh,
+    })
 end
 
 function M:setup()

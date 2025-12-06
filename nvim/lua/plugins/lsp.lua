@@ -12,12 +12,12 @@ return {
                 'html',
                 'postgres_lsp',
                 'jdtls',
-                'pyright',
                 'vimls',
                 'cssls',
                 'jdtls',
-                'gradle-ls',
-                'pyright'
+                'gradle_ls',
+                'basedpyright',
+                'ruff'
             },
             automatic_enable = {
                 exclude = { 'jdtls' },

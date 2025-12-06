@@ -73,6 +73,9 @@ vim.api.nvim_create_autocmd('FileType', {
     end,
 })
 
+-- Column ad 120 line
+vim.opt.colorcolumn = "120"
+
 -- Stay in visual mode after indentetion
 vim.keymap.set('v', '<', '<gv', { desc = 'Indent left in visual mode' })
 vim.keymap.set('v', '>', '>gv', { desc = 'Indent right in visual mode' })

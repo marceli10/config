@@ -64,6 +64,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', '<A-Enter>', vim.lsp.buf.code_action, opts)
         vim.keymap.set('n', 'gn', '<cmd>lua vim.diagnostic.jump({count=1, float=true})<cr>', opts)
         vim.keymap.set('n', 'gp', '<cmd>lua vim.diagnostic.jump({count=-1, float=true})<cr>', opts)
+
+        if client.server_capabilities.inlayHintProvider then
+            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+        end
     end,
 })
 
@@ -78,6 +82,43 @@ vim.lsp.config('lua_ls', {
             },
         },
     },
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
+})
+
+vim.lsp.config('basedpyright', {
+    settings = {
+        basedpyright = {
+            analysis = {
+                typeCheckingMode = 'strict', -- off | basic | standard | strict
+                strictParameterChecks = true,
+                strictPropertyInitialization = true,
+
+                diagnosticMode = 'workspace', -- Analyze whole project, not only open files
+                useLibraryCodeForTypes = true,
+                autoSearchPaths = true,
+                autoImportCompletions = true,
+
+                reportMissingTypeStubs = 'warning',
+                reportMissingImports = 'error',
+                reportUnboundVariable = 'error',
+                reportUnusedImport = 'warning',
+                reportUnusedFunction = 'warning',
+                reportUnusedVariable = 'warning',
+                reportIncompatibleMethodOverride = 'error',
+                reportIncompatibleVariableType = 'error',
+
+                logLevel = 'warning', -- reduce noise
+                indexing = true, -- faster global symbol search
+                completeFunctionParens = true,
+            },
+        },
+    },
+
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
+})
+
+vim.lsp.config('ruff', {
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
 vim.lsp.config('ts_ls', {
@@ -103,6 +144,7 @@ vim.lsp.config('ts_ls', {
             vim.lsp.util.jump_to_location(result[1], 'utf-8')
         end,
     },
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
 vim.lsp.config('gradle_ls', {
@@ -129,10 +171,11 @@ local servers = {
     'ts_ls',
     'html',
     'postgres_lsp',
-    'pyright',
+    'basedpyright',
     'vimls',
     'cssls',
-    'gradle_ls'
+    'gradle_ls',
+    'ruff',
 }
 
 vim.lsp.enable(servers)

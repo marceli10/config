@@ -46,6 +46,8 @@ return {
         -- Set Cursor background to Black, text inside to White
         vim.api.nvim_set_hl(0, 'Cursor', { bg = '#000000', fg = '#ffffff' })
         vim.api.nvim_set_hl(0, 'CursorInsert', { bg = '#000000', fg = '#ffffff' })
+        vim.api.nvim_set_hl(0, 'ColorColumn', { bg = '#808080' })
+
         vim.opt.guicursor = 'n-v-c:block-Cursor,i:ver25-CursorInsert'
     end,
 }

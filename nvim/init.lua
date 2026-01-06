@@ -7,3 +7,6 @@ require 'config.lazy'
 
 -- vim.opt.background = 'light'
 -- vim.cmd.colorscheme 'nightwolf'
+
+vim.cmd.colorscheme 'jb'
+vim.o.background = 'light'

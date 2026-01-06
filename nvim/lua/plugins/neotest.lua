@@ -23,8 +23,9 @@ return {
         },
         config = function()
             require('neotest').setup {
-                log_level = vim.log.levels.TRACE,
-
+                summary = {
+                    open = "botright vsplit | vertical resize 100"
+                },
                 adapters = {
                     require 'neotest-java' {},
                     require 'neotest-python',

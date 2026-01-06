@@ -11,6 +11,7 @@ return {
             },
             git = {
                 enable = true,
+                ignore = false,
             },
             filters = {
                 dotfiles = false,
@@ -52,12 +53,14 @@ return {
             },
         }
 
-        vim.api.nvim_create_autocmd("BufEnter", {
+        vim.api.nvim_create_autocmd('BufEnter', {
             nested = true,
             callback = function()
-                if (vim.fn.bufname() == "NvimTree_1") then return end
+                if vim.fn.bufname() == 'NvimTree_1' then
+                    return
+                end
 
-                require("nvim-tree.api").tree.find_file({ buf = vim.fn.bufnr() })
+                require('nvim-tree.api').tree.find_file { buf = vim.fn.bufnr() }
             end,
         })
 

@@ -43,7 +43,7 @@ function M:setup()
         -- The command that starts the language server
         -- See: https://github.com/eclipse/eclipse.jdt.ls#running-from-the-command-line
         cmd = {
-            vim.env.JAVA_HOME .. '/bin/java',
+            'java',
             '-Declipse.application=org.eclipse.jdt.ls.core.id1',
             '-Dosgi.bundles.defaultStartLevel=4',
             '-Declipse.product=org.eclipse.jdt.ls.core.product',
@@ -143,7 +143,6 @@ function M:setup()
             extendedClientCapabilities = extendedClientCapabilities,
         },
         extendedClientCapabilities = extendedClientCapabilities,
-        capabilities = require('cmp_nvim_lsp').default_capabilities(),
         on_attach = on_attach,
     }
 

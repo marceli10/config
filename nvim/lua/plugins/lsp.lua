@@ -25,10 +25,10 @@ return {
         },
         dependencies = {
             'neovim/nvim-lspconfig',
-            'hrsh7th/cmp-nvim-lsp',
+            'saghen/blink.cmp',
         },
     },
-    { 'mfussenegger/nvim-jdtls', dependencies = 'hrsh7th/cmp-nvim-lsp' },
+    { 'mfussenegger/nvim-jdtls', dependencies = 'saghen/blink.cmp' },
     {
         'MeanderingProgrammer/render-markdown.nvim',
         dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },

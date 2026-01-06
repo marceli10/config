@@ -31,7 +31,7 @@ local function on_attach(client, bufnr)
 
     if client.supports_method 'textDocument/codeLens' then
         vim.lsp.codelens.refresh()
-        vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+        vim.api.nvim_create_autocmd('BufWritePost', {
             buffer = bufnr,
             callback = vim.lsp.codelens.refresh,
         })
@@ -56,7 +56,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
         vim.keymap.set('n', 'gd', builtin.lsp_definitions, opts)
         vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-        vim.keymap.set('n', 'gi', builtin.lsp_implementations, opts)
+        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
         vim.keymap.set('n', 'gr', builtin.lsp_references, opts)
         vim.keymap.set('n', 'gs', builtin.lsp_workspace_symbols, opts)
         vim.keymap.set('n', 'rn', vim.lsp.buf.rename, opts)
@@ -82,7 +82,6 @@ vim.lsp.config('lua_ls', {
             },
         },
     },
-    capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
 vim.lsp.config('basedpyright', {
@@ -113,13 +112,9 @@ vim.lsp.config('basedpyright', {
             },
         },
     },
-
-    capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
-vim.lsp.config('ruff', {
-    capabilities = require('cmp_nvim_lsp').default_capabilities(),
-})
+vim.lsp.config('ruff', {})
 
 vim.lsp.config('ts_ls', {
     settings = {
@@ -144,7 +139,6 @@ vim.lsp.config('ts_ls', {
             vim.lsp.util.jump_to_location(result[1], 'utf-8')
         end,
     },
-    capabilities = require('cmp_nvim_lsp').default_capabilities(),
 })
 
 vim.lsp.config('gradle_ls', {

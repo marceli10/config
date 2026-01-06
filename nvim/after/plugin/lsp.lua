@@ -51,14 +51,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
         client.server_capabilities.semanticTokensProvider = nil
 
         local opts = { buffer = event.buf }
-        local builtin = require 'telescope.builtin'
+        local fzf = require 'fzf-lua'
 
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-        vim.keymap.set('n', 'gd', builtin.lsp_definitions, opts)
+        vim.keymap.set('n', 'gd', fzf.lsp_definitions, opts)
         vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
         vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-        vim.keymap.set('n', 'gr', builtin.lsp_references, opts)
-        vim.keymap.set('n', 'gs', builtin.lsp_workspace_symbols, opts)
+        vim.keymap.set('n', 'gr', fzf.lsp_references, opts)
+        vim.keymap.set('n', '<leader>fs', fzf.lsp_live_workspace_symbols, opts)
         vim.keymap.set('n', 'rn', vim.lsp.buf.rename, opts)
         vim.keymap.set({ 'n', 'x' }, '<C-f>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
         vim.keymap.set('n', '<A-Enter>', vim.lsp.buf.code_action, opts)
@@ -66,7 +66,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'gp', '<cmd>lua vim.diagnostic.jump({count=-1, float=true})<cr>', opts)
 
         if client.server_capabilities.inlayHintProvider then
-            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+            vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
         end
     end,
 })
@@ -74,6 +74,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 vim.lsp.config('lua_ls', {
     settings = {
         Lua = {
+            hint = { enabled = true },
             diagnostics = {
                 disable = {
                     'undefined-global',
@@ -88,6 +89,12 @@ vim.lsp.config('basedpyright', {
     settings = {
         basedpyright = {
             analysis = {
+               inlayHints = {
+                    variableTypes = true,
+                    callArgumentNames = true,
+                    functionReturnTypes = true,
+                    genericTypes = true,
+                },
                 typeCheckingMode = 'strict', -- off | basic | standard | strict
                 strictParameterChecks = true,
                 strictPropertyInitialization = true,
@@ -119,10 +126,28 @@ vim.lsp.config('ruff', {})
 vim.lsp.config('ts_ls', {
     settings = {
         javascript = {
+            inlayHints = {
+                includeInlayEnumMemberValueHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayParameterNameHints = 'all', -- 'none' | 'literals' | 'all'
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayVariableTypeHints = true,
+            },
             referencesCodeLens = { enabled = true },
             implementationsCodeLens = { enabled = true },
         },
         typescript = {
+            inlayHints = {
+                includeInlayEnumMemberValueHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayVariableTypeHints = true,
+            },
             referencesCodeLens = { enabled = true },
             implementationsCodeLens = { enabled = true },
         },

@@ -1,10 +1,11 @@
 return {
     {
         'NeogitOrg/neogit',
+        lazy = false,
         dependencies = {
             'nvim-lua/plenary.nvim',
             'sindrets/diffview.nvim',
-            'nvim-telescope/telescope.nvim',
+            'ibhagwan/fzf-lua',
         },
         keys = {
             { '<leader>gg', ':Neogit<CR>', desc = 'Open neo[GG]it split' },
@@ -25,18 +26,20 @@ return {
             { '<leader>gh', ':DiffviewFileHistory %<CR>', desc = 'Open [g]it [h]istory - current file' },
             { '<leader>gH', ':DiffviewFileHistory<CR>', desc = 'Open [g]it [H]istory - branch' },
             { '<leader>gD', ':DiffviewOpen<CR>', desc = 'Open [g]it [D]iff view - branch' },
-            { '<leader>gB', ':Telescope git_branches<CR>', desc = 'Open [g]it [B]ranches view' },
+            { '<leader>gB', ':FzfLua git_branches<CR>', desc = 'Open [g]it [B]ranches view' },
         },
         opts = {
             kind = 'split',
             integrations = {
                 diffview = true,
-                telescope = true,
+                fzf_lua = true,
+                snacks = true,
             },
         },
     },
     {
         'lewis6991/gitsigns.nvim',
+        lazy = false,
         opts = {
             signs = { add = { text = '+' } },
         },

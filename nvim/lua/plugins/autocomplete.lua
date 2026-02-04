@@ -12,18 +12,26 @@ return {
         },
 
         appearance = {
-            nerd_font_variant = 'mono'
+            nerd_font_variant = 'mono',
         },
 
-        completion = { documentation = { auto_show = true, auto_show_delay_ms = 500, } },
+        completion = {
+            documentation = { auto_show = true, auto_show_delay_ms = 500 },
+            ghost_text = { enabled = true },
+        },
 
-        -- Default list of enabled providers defined so that you can extend it
-        -- elsewhere in your config, without redefining it, due to `opts_extend`
         sources = {
             default = { 'lsp', 'path', 'snippets', 'buffer' },
+
+            providers = {
+                buffer = {
+                    opts = {
+                        max_total_buffer_size = 100 * 1024 * 1024, -- 100 MB
+                    },
+                },
+            },
         },
-
+        signature = { enabled = true },
     },
-    opts_extend = { "sources.default" }
+    opts_extend = { 'sources.default' },
 }
-

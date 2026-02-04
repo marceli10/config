@@ -131,13 +131,13 @@ sketchybar --add item clock right \
   --set volume script="$PLUGIN_DIR/volume.sh" \
   --subscribe volume volume_change \
   \
-    --add item btc right \
-  --set btc \
-  icon= \
-  script="$PLUGIN_DIR/btc.sh" \
-  update_freq=60 \
-  --subscribe btc mouse.clicked  \
-  \
+  #   --add item btc right \
+  # --set btc \
+  # icon= \
+  # script="$PLUGIN_DIR/btc.sh" \
+  # update_freq=60 \
+  # --subscribe btc mouse.clicked  \
+  # \
   --add item space_creator left               \
   --set space_creator "${space_creator[@]}"   \
   --subscribe space_creator aerospace_workspace_change 

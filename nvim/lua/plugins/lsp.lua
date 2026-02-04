@@ -17,7 +17,7 @@ return {
                 'jdtls',
                 'gradle_ls',
                 'basedpyright',
-                'ruff'
+                'ruff',
             },
             automatic_enable = {
                 exclude = { 'jdtls' },

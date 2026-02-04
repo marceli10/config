@@ -17,6 +17,10 @@ return {
                 dotfiles = false,
             },
             renderer = {
+                indent_markers = {
+                    enable = true,
+                    inline_arrows = true,
+                },
                 icons = {
                     webdev_colors = true, -- enable filetype icon colors
                     git_placement = 'before', -- or "after"

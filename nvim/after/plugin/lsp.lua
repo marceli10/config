@@ -89,7 +89,7 @@ vim.lsp.config('basedpyright', {
     settings = {
         basedpyright = {
             analysis = {
-               inlayHints = {
+                inlayHints = {
                     variableTypes = true,
                     callArgumentNames = true,
                     functionReturnTypes = true,
@@ -195,6 +195,7 @@ local servers = {
     'cssls',
     'gradle_ls',
     'ruff',
+    'zls',
 }
 
 vim.lsp.enable(servers)

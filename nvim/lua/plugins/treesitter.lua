@@ -31,6 +31,7 @@ return {
                 'css',
                 'javascript',
                 'typescript',
+                'zig',
             },
             highlight = { enable = true },
             auto_install = true,

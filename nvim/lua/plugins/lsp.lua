@@ -18,6 +18,7 @@ return {
                 'gradle_ls',
                 'basedpyright',
                 'ruff',
+                'zls',
             },
             automatic_enable = {
                 exclude = { 'jdtls' },

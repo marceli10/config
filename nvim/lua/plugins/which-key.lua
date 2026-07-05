@@ -1,13 +1,22 @@
-  return { 
+return {
     'folke/which-key.nvim',
-    event = 'VimEnter',
+    event = 'VeryLazy',
     opts = {
-        register = {
-            ['<leader>/'] = {name = "Comments", _ = 'which_key_ignore'},
-            ['<leader>g'] = { name = '[G]ode', _ = 'which_key_ignore' },
-            ['<leader>d'] = {name = '[D]ebug' , _ = 'which_key_ignore' },
-            ['<leader>f'] = { name = '[F]ind', _ = 'which_key_ignore' },
-            ['<leader>w'] = {name = '[W]indow', _ = 'which_key_ignore'}
-        }
-    }
-  }
+        spec = {
+            { '<leader>f', group = 'find' },
+            { '<leader>fg', group = 'git' },
+            { '<leader>t', group = 'test' },
+            { '<leader>d', group = 'debug' },
+            { '<leader>r', group = 'run' },
+        },
+    },
+    keys = {
+        {
+            '<leader>?',
+            function()
+                require('which-key').show { global = false }
+            end,
+            desc = 'Buffer Local Keymaps (which-key)',
+        },
+    },
+}

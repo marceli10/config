@@ -11,18 +11,6 @@ vim.keymap.set('i', 'jj', '<Esc>', { desc = 'Escape insert mode' })
 vim.keymap.set('n', '+', 'zO', { noremap = true, silent = true, desc = 'Open fold' })
 vim.keymap.set('n', '-', 'zc', { noremap = true, silent = true, desc = 'Fold text' })
 
--- Inline diagnostic
-vim.diagnostic.config { virtual_text = true }
-
--- Use Tree-sitter for folding
-vim.opt.foldmethod = 'expr'
-vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
-
--- Optional: start with folds open
-vim.opt.foldlevel = 99
-vim.opt.foldlevelstart = 99
-vim.opt.foldenable = true
-
 vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Move to left window' })
 vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Move to right window' })
 vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Move to window below' })
@@ -46,6 +34,7 @@ vim.opt.breakindent = true
 vim.opt.scrolloff = 20
 vim.g.have_nerd_font = true
 vim.opt.updatetime = 150 -- Trigger faster events
+vim.g.loaded_matchparen = 1
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -73,9 +62,42 @@ vim.api.nvim_create_autocmd('FileType', {
     end,
 })
 
--- Column ad 120 line
-vim.opt.colorcolumn = "120"
+-- Column at 120, toggleable via <leader>ct, persisted across windows/buffers.
+-- colorcolumn is window-local, so a global flag drives every window.
+vim.g.colorcolumn_enabled = false
+
+local function colorcolumn_value()
+    return vim.g.colorcolumn_enabled and '120' or ''
+end
+
+local function apply_colorcolumn(win)
+    vim.api.nvim_set_option_value('colorcolumn', colorcolumn_value(), { scope = 'local', win = win })
+end
+
+-- Newly entered windows pick up the persisted state
+vim.api.nvim_create_autocmd({ 'WinEnter', 'BufWinEnter' }, {
+    desc = 'Apply persisted colorcolumn state',
+    group = vim.api.nvim_create_augroup('colorcolumn-toggle', { clear = true }),
+    callback = function()
+        apply_colorcolumn(0)
+    end,
+})
+
+vim.keymap.set('n', '<leader>ct', function()
+    vim.g.colorcolumn_enabled = not vim.g.colorcolumn_enabled
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        apply_colorcolumn(win)
+    end
+end, { desc = '[C]olorcolumn [T]oggle' })
+
+-- Apply initial state to the current window
+apply_colorcolumn(0)
 
 -- Stay in visual mode after indentetion
 vim.keymap.set('v', '<', '<gv', { desc = 'Indent left in visual mode' })
 vim.keymap.set('v', '>', '>gv', { desc = 'Indent right in visual mode' })
+
+-- Commenting (built-in gc/gcc)
+vim.keymap.set('n', '<leader>c', 'gc', { remap = true, desc = '[C]omment (operator)' })
+vim.keymap.set('n', '<leader>cc', 'gcc', { remap = true, desc = '[C]omment toggle line' })
+vim.keymap.set('x', '<leader>c', 'gc', { remap = true, desc = '[C]omment selection' })

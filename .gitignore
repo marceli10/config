@@ -1,0 +1,8 @@
+.*.*
+*.*
+*/*
+
+!nvim/**
+nvim/.*
+nvim/*.md
+!.gitignore

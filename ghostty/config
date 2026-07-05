@@ -1,2 +1,16 @@
 keybind=ctrl+1=text:\x1b[49;5u
 shell-integration-features = ssh-terminfo,ssh-env
+
+theme = light:jb-light,dark:jb-dark
+
+cursor-style = block
+cursor-style-blink = false
+cursor-invert-fg-bg = true
+cursor-color = cell-foreground
+cursor-text = cell-background
+background-opacity = 0.85
+background-blur = 20
+
+window-padding-x = 10
+window-padding-y = 10
+font-size = 14

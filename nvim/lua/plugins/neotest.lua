@@ -84,6 +84,9 @@ return {
                 require 'neotest-vitest' {},
                 require 'neotest-java' {},
             },
+            floating = {
+                border = 'rounded',
+            },
         }
     end,
 }

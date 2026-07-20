@@ -26,6 +26,7 @@ return {
                 },
             },
             window = {
+                auto_expand_width = true,
                 mappings = {
                     ['P'] = {
                         'toggle_preview',
@@ -53,6 +54,72 @@ return {
                             require('neo-tree.command').execute { source = 'buffers', action = 'focus' }
                         end,
                         desc = 'Neo-tree: buffers',
+                    },
+                    ['Z'] = {
+                        function(state)
+                            local root = state.path
+                            local ignored_dirs = {}
+                            local git_root = vim.fn.systemlist({ 'git', '-C', root, 'rev-parse', '--show-toplevel' })[1]
+                            if vim.v.shell_error == 0 and git_root then
+                                local lines = vim.fn.systemlist {
+                                    'git',
+                                    '-C',
+                                    git_root,
+                                    'ls-files',
+                                    '--others',
+                                    '--ignored',
+                                    '--exclude-standard',
+                                    '--directory',
+                                }
+                                for _, line in ipairs(lines) do
+                                    if line:sub(-1) == '/' then
+                                        table.insert(ignored_dirs, git_root .. '/' .. line:sub(1, -2))
+                                    end
+                                end
+                            end
+
+                            local function is_ignored(path)
+                                for _, dir in ipairs(ignored_dirs) do
+                                    if path == dir or path:sub(1, #dir + 1) == dir .. '/' then
+                                        return true
+                                    end
+                                end
+                                return false
+                            end
+
+                            local fs = require 'neo-tree.sources.filesystem'
+                            local renderer = require 'neo-tree.ui.renderer'
+                            local async = require 'plenary.async'
+
+                            state.explicitly_opened_nodes = state.explicitly_opened_nodes or {}
+
+                            local function expand(node)
+                                if is_ignored(node:get_id()) then
+                                    return
+                                end
+                                if fs.prefetcher.should_prefetch(node) then
+                                    fs.prefetcher.prefetch(state, node)
+                                end
+                                if not node:is_expanded() then
+                                    node:expand()
+                                    state.explicitly_opened_nodes[node:get_id()] = true
+                                end
+                                for _, child in ipairs(state.tree:get_nodes(node:get_id())) do
+                                    if child.type == 'directory' then
+                                        expand(child)
+                                    end
+                                end
+                            end
+
+                            async.run(function()
+                                for _, root_node in pairs(state.tree:get_nodes()) do
+                                    expand(root_node)
+                                end
+                            end, function()
+                                renderer.redraw(state)
+                            end)
+                        end,
+                        desc = 'Expand all (except gitignored)',
                     },
                 },
             },

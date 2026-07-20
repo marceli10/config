@@ -8,9 +8,6 @@ vim.keymap.set('i', 'jj', '<Esc>', { desc = 'Escape insert mode' })
 -- vim.keymap.set("n", "<C-s>", vim.cmd.w, { desc = "Save file" })
 -- vim.keymap.set("i", "<C-s>", vim.cmd.wa, { desc = "Save file in insert mode" })
 
-vim.keymap.set('n', '+', 'zO', { noremap = true, silent = true, desc = 'Open fold' })
-vim.keymap.set('n', '-', 'zc', { noremap = true, silent = true, desc = 'Fold text' })
-
 vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Move to left window' })
 vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Move to right window' })
 vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Move to window below' })
@@ -101,3 +98,7 @@ vim.keymap.set('v', '>', '>gv', { desc = 'Indent right in visual mode' })
 vim.keymap.set('n', '<leader>c', 'gc', { remap = true, desc = '[C]omment (operator)' })
 vim.keymap.set('n', '<leader>cc', 'gcc', { remap = true, desc = '[C]omment toggle line' })
 vim.keymap.set('x', '<leader>c', 'gc', { remap = true, desc = '[C]omment selection' })
+
+-- Jump between a source file and its test file (gT; gt is taken by LSP type-definition)
+local goto_test = require 'config.goto_test'
+vim.keymap.set('n', 'gT', goto_test.jump, { desc = 'Go to test/source file' })

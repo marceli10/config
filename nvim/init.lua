@@ -1,2 +1,2 @@
-require("mappings")
-require("config.lazy")
+require 'mappings'
+require 'config.lazy'

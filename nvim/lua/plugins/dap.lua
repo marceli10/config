@@ -106,7 +106,10 @@ return {
         vim.fn.sign_define('DapBreakpointCondition', { text = '●', texthl = 'DapBreakpoint' })
         vim.fn.sign_define('DapBreakpointRejected', { text = '○', texthl = 'DapBreakpoint' })
         vim.fn.sign_define('DapLogPoint', { text = '◆', texthl = 'DapLogPoint' })
-        vim.fn.sign_define('DapStopped', { text = '▶', texthl = 'DapStopped', linehl = 'DapStoppedLine', numhl = 'DapStopped' })
+        vim.fn.sign_define(
+            'DapStopped',
+            { text = '▶', texthl = 'DapStopped', linehl = 'DapStoppedLine', numhl = 'DapStopped' }
+        )
 
         dap.listeners.before.attach.dapui_config = function()
             dapui.open()

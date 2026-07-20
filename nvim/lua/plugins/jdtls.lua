@@ -59,7 +59,8 @@ return {
 
         local function bundles()
             local list = {}
-            local debug_jar = vim.fn.glob(mason_path .. '/share/java-debug-adapter/com.microsoft.java.debug.plugin-*.jar')
+            local debug_jar =
+                vim.fn.glob(mason_path .. '/share/java-debug-adapter/com.microsoft.java.debug.plugin-*.jar')
             if debug_jar ~= '' then
                 vim.list_extend(list, vim.split(debug_jar, '\n'))
             end

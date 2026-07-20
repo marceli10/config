@@ -1,4 +1,11 @@
 keybind=ctrl+1=text:\x1b[49;5u
+
+# Fold chords forwarded to Neovim (decoded as <M-...> keycodes)
+keybind = alt+minus=csi:45;3u
+keybind = alt+equal=csi:61;3u
+keybind = alt+shift+minus=csi:95;3u
+keybind = alt+shift+equal=csi:43;3u
+
 shell-integration-features = ssh-terminfo,ssh-env
 
 theme = light:jb-light,dark:jb-dark

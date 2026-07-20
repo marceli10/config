@@ -1,6 +1,6 @@
 return {
-    "folke/noice.nvim",
-    event = "VeryLazy",
+    'folke/noice.nvim',
+    event = 'VeryLazy',
     opts = {
         presets = {
             -- Rounded border around K hover docs + signature help (uses theme FloatBorder color).
@@ -11,32 +11,32 @@ return {
     -- back to the normal half-page scroll. blink owns C-d/C-u in insert mode, so this is normal mode only.
     keys = {
         {
-            "<C-d>",
+            '<C-d>',
             function()
-                if not require("noice.lsp").scroll(4) then
-                    return "<C-d>"
+                if not require('noice.lsp').scroll(4) then
+                    return '<C-d>'
                 end
             end,
-            mode = "n",
+            mode = 'n',
             silent = true,
             expr = true,
-            desc = "Scroll hover docs down",
+            desc = 'Scroll hover docs down',
         },
         {
-            "<C-u>",
+            '<C-u>',
             function()
-                if not require("noice.lsp").scroll(-4) then
-                    return "<C-u>"
+                if not require('noice.lsp').scroll(-4) then
+                    return '<C-u>'
                 end
             end,
-            mode = "n",
+            mode = 'n',
             silent = true,
             expr = true,
-            desc = "Scroll hover docs up",
+            desc = 'Scroll hover docs up',
         },
     },
     dependencies = {
-        "MunifTanjim/nui.nvim",
-        "rcarriga/nvim-notify",
-    }
+        'MunifTanjim/nui.nvim',
+        'rcarriga/nvim-notify',
+    },
 }

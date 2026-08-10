@@ -25,6 +25,20 @@ return {
             },
             show_in_active_only = true,
             hide_if_all_visible = true,
+
+            excluded_filetypes = {
+                'blink-cmp-menu',
+                'dropbar_menu',
+                'dropbar_menu_fzf',
+                'DressingInput',
+                'cmp_docs',
+                'cmp_menu',
+                'noice',
+                'prompt',
+                'TelescopePrompt',
+                'neo-tree',
+                'neo-tree-popup',
+            },
             marks = {
                 -- Distinguish added vs modified lines: solid bar vs dashed bar, distinct colors.
                 GitAdd = { text = '┃', color = hl_fg 'GitSignsAdd' },

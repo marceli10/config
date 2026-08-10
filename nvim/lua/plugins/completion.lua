@@ -35,6 +35,9 @@ return {
         },
         sources = {
             default = { 'lsp', 'path', 'snippets', 'buffer' },
+            providers = {
+                lsp = { async = true },
+            },
         },
         snippets = { preset = 'default' },
         fuzzy = { implementation = 'prefer_rust_with_warning' },

@@ -5,6 +5,7 @@ return {
         spec = {
             { '<leader>f', group = 'find' },
             { '<leader>fg', group = 'git' },
+            { '<leader>g', group = 'git' },
             { '<leader>t', group = 'test' },
             { '<leader>d', group = 'debug' },
             { '<leader>r', group = 'run' },

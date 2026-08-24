@@ -8,6 +8,7 @@ return {
             { '<leader>g', group = 'git' },
             { '<leader>t', group = 'test' },
             { '<leader>d', group = 'debug' },
+            { '<leader>j', group = 'java' },
             { '<leader>r', group = 'run' },
         },
     },

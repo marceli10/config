@@ -31,5 +31,6 @@ return {
             height = 0.85,
             width = 0.85,
         },
+        lsp = { async_or_timeout = true },
     },
 }

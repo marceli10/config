@@ -1,5 +1,3 @@
---- Navigate hunks only while the hunk preview popup is open; otherwise fall
---- through to the built-in mapping.
 local function nav_hunk_in_preview(direction, fallback)
     return function()
         if require('gitsigns.popup').is_open 'hunk' then
@@ -9,7 +7,6 @@ local function nav_hunk_in_preview(direction, fallback)
     end
 end
 
---- Close the blame split if one is open in this tabpage, otherwise open it.
 local function toggle_blame_window()
     for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
         if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == 'gitsigns-blame' then
@@ -20,7 +17,6 @@ local function toggle_blame_window()
     vim.cmd.Gitsigns 'blame'
 end
 
---- Close the diffview tab if one is open anywhere, otherwise diff the worktree.
 local function toggle_diffview()
     for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
         for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
@@ -35,8 +31,6 @@ local function toggle_diffview()
     vim.cmd.DiffviewOpen()
 end
 
---- Quickfix list of every file with an unresolved conflict, jumping to the
---- first marker in each.
 local function conflict_qflist()
     local git = vim.system({ 'git', 'diff', '--name-only', '--diff-filter=U', '--relative' }, { text = true }):wait()
     if git.code ~= 0 then
@@ -66,7 +60,6 @@ local function conflict_qflist()
 end
 
 return {
-    -- Hunk signs, blame, hunk preview/reset.
     {
         'lewis6991/gitsigns.nvim',
         lazy = false,
@@ -78,25 +71,29 @@ return {
             { '<leader>gB', toggle_blame_window, desc = 'Git history blame (toggle)' },
             { '<leader>gb', '<cmd>Gitsigns blame_line<cr>', desc = 'Git blame line' },
             { '<leader>gh', '<cmd>Gitsigns preview_hunk<cr>', desc = 'Git preview hunk' },
-            { '<C-n>', nav_hunk_in_preview('next', '<C-n>'), expr = true, desc = 'Git next hunk (in preview)' },
-            { '<C-p>', nav_hunk_in_preview('prev', '<C-p>'), expr = true, desc = 'Git previous hunk (in preview)' },
+            {
+                '<C-n>',
+                nav_hunk_in_preview('next', '<C-n>'),
+                expr = true,
+                desc = 'Git next hunk (in preview)',
+            },
+            {
+                '<C-p>',
+                nav_hunk_in_preview('prev', '<C-p>'),
+                expr = true,
+                desc = 'Git previous hunk (in preview)',
+            },
             { '<leader>gu', '<cmd>Gitsigns reset_hunk<cr>', desc = 'Git undo hunk' },
             { '<leader>gU', '<cmd>Gitsigns reset_buffer<cr>', desc = 'Git undo buffer' },
         },
     },
 
-    -- Diff preview, file/line-range history, commit log, 3-way merge tool.
     {
         'sindrets/diffview.nvim',
         cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewFileHistory' },
         opts = function()
             local actions = require 'diffview.actions'
 
-            -- Diffview's conflict keys all live under <leader>c, which is the
-            -- comment operator -- every <leader>c press in a merge buffer would
-            -- stall on timeoutlen while vim waits to disambiguate. Rebound to
-            -- the bare c* family instead. Lowercase acts on the conflict under
-            -- the cursor, uppercase on the whole file.
             local whole_file_keys = {
                 { 'n', '<leader>cO', false },
                 { 'n', '<leader>cT', false },
@@ -120,15 +117,12 @@ return {
 
             return {
                 view = {
-                    default = { layout = 'diff2_horizontal' },
-                    -- OURS | THEIRS side by side over an editable RESULT, with
-                    -- the BASE pane reachable -- closest to IntelliJ's dialog.
+                    default = { layout = 'diff2_horizontal', winbar_info = true },
                     merge_tool = { layout = 'diff3_mixed', disable_diagnostics = true, winbar_info = true },
-                    file_history = { layout = 'diff2_horizontal' },
+                    file_history = { layout = 'diff2_horizontal', winbar_info = true },
                 },
                 keymaps = {
                     view = conflict_keys,
-                    -- The file panel only ever gets the whole-file variants.
                     file_panel = whole_file_keys,
                 },
             }
@@ -136,13 +130,17 @@ return {
         keys = {
             { '<leader>gd', toggle_diffview, desc = 'Git diff worktree (toggle)' },
             { '<leader>gf', '<cmd>DiffviewFileHistory %<cr>', desc = 'Git file history' },
-            { '<leader>gf', ':DiffviewFileHistory<cr>', mode = 'x', desc = 'Git history for selection' },
+            {
+                '<leader>gf',
+                ':DiffviewFileHistory<cr>',
+                mode = 'x',
+                desc = 'Git history for selection',
+            },
             { '<leader>gl', '<cmd>DiffviewFileHistory<cr>', desc = 'Git commit log' },
             { '<leader>gx', conflict_qflist, desc = 'Git conflicts (quickfix)' },
         },
     },
 
-    -- Staging, committing, branches, rebase.
     {
         'NeogitOrg/neogit',
         cmd = 'Neogit',
@@ -152,7 +150,7 @@ return {
         },
         opts = {
             integrations = { diffview = true, fzf_lua = true },
-            kind = 'floating'
+            kind = 'floating',
         },
         keys = {
             { '<leader>gg', '<cmd>Neogit<cr>', desc = 'Git status (Neogit)' },

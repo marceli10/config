@@ -1,0 +1,7 @@
+eclipse.preferences.version=1
+
+# javac -parameters. JDT compiles the project itself, so classes launched by
+# java-debug/java-test carry no parameter names unless this is set, and Spring
+# fails at runtime on @RequestParam/@PathVariable without an explicit name.
+# Gradle's own compileJava flags never reach JDT.
+org.eclipse.jdt.core.compiler.codegen.methodParameters=generate

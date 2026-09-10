@@ -10,6 +10,8 @@ return {
                 capabilities = require('blink.cmp').get_lsp_capabilities(),
             })
 
+            vim.lsp.enable { 'zls', 'pyrefly', 'ruff', 'clangd', 'eslint', 'lua_ls' }
+
             vim.diagnostic.config {
                 underline = true,
                 update_in_insert = false,
@@ -28,6 +30,56 @@ return {
                     },
                 },
             }
+
+            local ok, capability = pcall(require, 'vim.lsp._capability')
+            local codelens = ok and pcall(require, 'vim.lsp.codelens') and capability.all.codelens
+            if codelens then
+                codelens.on_win = function(self, toprow, botrow)
+                    for row = toprow, botrow do
+                        if self.row_version[row] ~= self.version then
+                            for client_id, state in pairs(self.client_state) do
+                                vim.api.nvim_buf_clear_namespace(self.bufnr, state.namespace, row, row + 1)
+
+                                local lenses = state.row_lenses[row]
+                                if lenses then
+                                    table.sort(lenses, function(a, b)
+                                        return a.range.start.character < b.range.start.character
+                                    end)
+
+                                    local client = assert(vim.lsp.get_client_by_id(client_id))
+                                    local virt_text = {}
+                                    for _, lens in ipairs(lenses) do
+                                        if not lens.command then
+                                            self:resolve(client, lens)
+                                        else
+                                            vim.list_extend(virt_text, {
+                                                { lens.command.title, 'LspCodeLens' },
+                                                { ' | ', 'LspCodeLensSeparator' },
+                                            })
+                                        end
+                                    end
+                                    table.remove(virt_text)
+
+                                    if #virt_text > 0 then
+                                        vim.api.nvim_buf_set_extmark(self.bufnr, state.namespace, row, 0, {
+                                            virt_text = virt_text,
+                                            virt_text_pos = 'eol',
+                                            hl_mode = 'combine',
+                                        })
+                                    end
+                                end
+                            end
+                            self.row_version[row] = self.version
+                        end
+                    end
+
+                    if botrow == vim.api.nvim_buf_line_count(self.bufnr) - 1 then
+                        for _, state in pairs(self.client_state) do
+                            vim.api.nvim_buf_clear_namespace(self.bufnr, state.namespace, botrow + 1, -1)
+                        end
+                    end
+                end
+            end
 
             vim.api.nvim_create_autocmd('LspAttach', {
                 callback = function(event)
@@ -59,47 +111,6 @@ return {
                         vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
                     end
                 end,
-            })
-
-            vim.lsp.config('lua_ls', {
-                settings = {
-                    Lua = {
-                        workspace = { checkThirdParty = false },
-                        codeLens = { enable = true },
-                        completion = { callSnippet = 'Replace' },
-                        doc = { privateName = { '^_' } },
-                        hint = {
-                            enable = true,
-                            setType = false,
-                            paramType = true,
-                            paramName = 'Disable',
-                            semicolon = 'Disable',
-                            arrayIndex = 'Disable',
-                        },
-                    },
-                },
-            })
-
-            vim.lsp.config('zls', {
-                settings = {
-                    zls = {
-                        enable_build_on_save = true,
-                        build_on_save_step = 'install',
-                    },
-                },
-            })
-
-            vim.lsp.config('ruff', {
-                on_attach = function(client)
-                    client.server_capabilities.hoverProvider = false
-                end,
-            })
-
-            vim.lsp.config('eslint', {
-                settings = {
-                    workingDirectories = { mode = 'auto' },
-                    format = false,
-                },
             })
         end,
     },

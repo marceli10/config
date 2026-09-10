@@ -3,137 +3,6 @@ return {
     ft = { 'java' },
     dependencies = { 'neovim/nvim-lspconfig' },
     config = function()
-        local mason_path = vim.fn.stdpath 'data' .. '/mason'
-        local function java_runtimes()
-            local environments = {
-                [8] = 'JavaSE-1.8',
-                [11] = 'JavaSE-11',
-                [17] = 'JavaSE-17',
-                [21] = 'JavaSE-21',
-                [25] = 'JavaSE-25',
-            }
-
-            local newest = {}
-            for _, root in ipairs {
-                '/Library/Java/JavaVirtualMachines',
-                vim.fn.expand '~/Library/Java/JavaVirtualMachines',
-            } do
-                for entry in vim.fs.dir(root) do
-                    local home = ('%s/%s/Contents/Home'):format(root, entry)
-                    local release = io.open(home .. '/release')
-                    local version
-                    if release then
-                        version = release:read('*a'):match 'JAVA_VERSION="([%d%._]+)"'
-                        release:close()
-                    elseif vim.uv.fs_stat(home .. '/bin/java') then
-                        version = entry:match '(%d[%d%._]*)'
-                    end
-                    local major = tonumber(version and (version:match '^1%.(%d+)' or version:match '^(%d+)'))
-                    if major and environments[major] and (not newest[major] or newest[major].version < version) then
-                        newest[major] = { name = environments[major], path = home, version = version }
-                    end
-                end
-            end
-
-            local runtimes = {}
-            for _, runtime in pairs(newest) do
-                table.insert(runtimes, { name = runtime.name, path = runtime.path })
-            end
-            return runtimes
-        end
-
-        local runtimes = java_runtimes()
-
-        local function gradle_java_home()
-            local by_environment = {}
-            for _, runtime in ipairs(runtimes) do
-                by_environment[runtime.name] = runtime.path
-            end
-            return by_environment['JavaSE-21'] or by_environment['JavaSE-17']
-        end
-
-        local function jdtls_opts()
-            local cmd = { vim.fn.exepath 'jdtls' }
-            local lombok_jar = mason_path .. '/share/jdtls/lombok.jar'
-            table.insert(cmd, string.format('--jvm-arg=-javaagent:%s', lombok_jar))
-            for _, arg in ipairs {
-                '-XX:+UseParallelGC',
-                '-XX:GCTimeRatio=4',
-                '-XX:AdaptiveSizePolicyWeight=90',
-                '-Dsun.zip.disableMemoryMapping=true',
-                '-Xmx2G',
-            } do
-                table.insert(cmd, '--jvm-arg=' .. arg)
-            end
-
-            return {
-                root_dir = function(path)
-                    return vim.fs.root(path, vim.lsp.config.jdtls.root_markers)
-                end,
-                project_name = function(root_dir)
-                    return root_dir and (vim.fs.basename(root_dir) .. '-' .. vim.fn.sha256(root_dir):sub(1, 8))
-                end,
-                jdtls_config_dir = function(project_name)
-                    return vim.fn.stdpath 'cache' .. '/jdtls/' .. project_name .. '/config'
-                end,
-                jdtls_workspace_dir = function(project_name)
-                    return vim.fn.stdpath 'cache' .. '/jdtls/' .. project_name .. '/workspace'
-                end,
-                cmd = cmd,
-                full_cmd = function(opts)
-                    local fname = vim.api.nvim_buf_get_name(0)
-                    local root_dir = opts.root_dir(fname)
-                    local project_name = opts.project_name(root_dir)
-                    local full = vim.deepcopy(opts.cmd)
-                    if project_name then
-                        vim.list_extend(full, {
-                            '-configuration',
-                            opts.jdtls_config_dir(project_name),
-                            '-data',
-                            opts.jdtls_workspace_dir(project_name),
-                        })
-                    end
-                    return full
-                end,
-                dap = { hotcodereplace = 'auto', config_overrides = {} },
-                dap_main = {},
-                settings = {
-                    java = {
-                        format = { enabled = true },
-                        inlayHints = {
-                            parameterNames = { enabled = 'all' },
-                        },
-                        completion = {
-                            importOrder = { 'java', 'javax', 'jakarta', 'org', 'com', '' },
-                        },
-                        configuration = {
-                            updateBuildConfiguration = 'automatic',
-                            runtimes = runtimes,
-                        },
-                        import = {
-                            gradle = { java = { home = gradle_java_home() } },
-                        },
-                        autobuild = { enabled = true },
-                        saveActions = { organizeImports = true },
-                    },
-                },
-            }
-        end
-
-        local opts = jdtls_opts()
-
-        local function bundles()
-            local list = {}
-            local debug_jar =
-                vim.fn.glob(mason_path .. '/share/java-debug-adapter/com.microsoft.java.debug.plugin-*.jar')
-            if debug_jar ~= '' then
-                vim.list_extend(list, vim.split(debug_jar, '\n'))
-            end
-            local test_jars = vim.fn.glob(mason_path .. '/share/java-test/*.jar', false, true)
-            vim.list_extend(list, test_jars)
-            return list
-        end
-
         local library_favorites = {
             'org.junit.Assert.*',
             'org.junit.Assume.*',
@@ -192,23 +61,35 @@ return {
         end
 
         local function attach_jdtls()
-            local fname = vim.api.nvim_buf_get_name(0)
-            local root_dir = opts.root_dir(fname)
-            local settings = vim.deepcopy(opts.settings)
-            settings.java.completion.favoriteStaticMembers = favorites_for(root_dir)
+            local config = vim.deepcopy(vim.lsp.config.jdtls)
+            local root_dir = vim.fs.root(vim.api.nvim_buf_get_name(0), config.root_markers)
 
-            local config = {
-                cmd = opts.full_cmd(opts),
-                root_dir = root_dir,
-                init_options = {
-                    bundles = bundles(),
-                    extendedClientCapabilities = require('jdtls').extendedClientCapabilities,
-                },
-                settings = settings,
-                capabilities = require('blink.cmp').get_lsp_capabilities(),
-            }
+            if root_dir then
+                local project = vim.fs.basename(root_dir) .. '-' .. vim.fn.sha256(root_dir):sub(1, 8)
+                local cache = vim.fn.stdpath 'cache' .. '/jdtls/' .. project
+                vim.list_extend(config.cmd, { '-configuration', cache .. '/config', '-data', cache .. '/workspace' })
+            end
+
+            config.root_dir = root_dir
+            config.settings.java.completion.favoriteStaticMembers = favorites_for(root_dir)
+            -- classFileContentsSupport is what makes the server hand out jdt:// URIs
+            -- for compiled types; nvim-jdtls resolves those via its BufReadCmd, and
+            -- without the flag gd into a JDK/library type dead-ends. The prompt flags
+            -- enable the override/constructor/toString/extract code actions.
+            -- resolveAdditionalTextEditsSupport keeps the auto-import edit attached to
+            -- a completion item when blink.cmp accepts it.
+            config.init_options.extendedClientCapabilities =
+                vim.tbl_extend('force', require('jdtls').extendedClientCapabilities, {
+                    resolveAdditionalTextEditsSupport = true,
+                })
+            config.capabilities = require('blink.cmp').get_lsp_capabilities()
             require('jdtls').start_or_attach(config)
         end
+
+        -- Has to run before nvim-jdtls' own LspAttach hook, which calls
+        -- setup_dap({}); setup_dap early-returns once dap.adapters.java is set,
+        -- so calling it from an LspAttach callback silently drops these opts.
+        require('jdtls.dap').setup_dap { hotcodereplace = 'auto' }
 
         vim.api.nvim_create_autocmd('FileType', {
             pattern = 'java',
@@ -226,6 +107,14 @@ return {
                 local map = function(mode, lhs, rhs, desc)
                     vim.keymap.set(mode, lhs, rhs, { buffer = args.buf, desc = desc })
                 end
+
+                vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+                    buffer = args.buf,
+                    callback = function()
+                        vim.lsp.codelens.refresh { bufnr = args.buf }
+                    end,
+                })
+                vim.lsp.codelens.refresh { bufnr = args.buf }
 
                 map('n', '<leader>co', jdtls.organize_imports, 'Organize Imports')
                 map('n', '<leader>cxv', jdtls.extract_variable_all, 'Extract Variable')
@@ -249,16 +138,14 @@ return {
                     vim.notify(('jdtls: %d static import favorites'):format(#favorites))
                 end, 'Rescan static import favorites')
 
-                jdtls.setup_dap(opts.dap)
-
                 local jdtls_dap = require 'jdtls.dap'
                 map('n', '<leader>dm', function()
-                    jdtls_dap.setup_dap_main_class_configs(vim.tbl_extend('force', opts.dap_main, {
+                    jdtls_dap.setup_dap_main_class_configs {
                         verbose = true,
                         on_ready = function()
                             require('dap').continue()
                         end,
-                    }))
+                    }
                 end, 'Debug main class')
                 map('n', '<leader>dn', jdtls_dap.test_nearest_method, 'Debug nearest test')
                 map('n', '<leader>dT', jdtls_dap.test_class, 'Debug test class')

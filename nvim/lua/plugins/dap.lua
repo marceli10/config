@@ -93,6 +93,25 @@ return {
         -- configurations; neotest-python's dap strategy reuses this adapter.
         require('dap-python').setup(vim.fn.stdpath 'data' .. '/mason/packages/debugpy/venv/bin/python')
 
+        -- Poetry/Pipenv store their venv outside the project dir, so dap-python's
+        -- built-in venv/.venv folder scan misses them; mirrors neotest-python's own
+        -- fallback (base.lua) so <leader>dc and <leader>td resolve the same interpreter.
+        require('dap-python').resolve_python = function()
+            local cwd = vim.fn.getcwd()
+            if vim.fn.filereadable(cwd .. '/Pipfile') == 1 then
+                local venv = vim.fn.system({ 'pipenv', '--py' }):gsub('%s+$', '')
+                if vim.v.shell_error == 0 and venv ~= '' then
+                    return venv
+                end
+            end
+            if vim.fn.filereadable(cwd .. '/pyproject.toml') == 1 then
+                local venv_dir = vim.fn.system({ 'poetry', 'env', 'info', '-p' }):gsub('%s+$', '')
+                if vim.v.shell_error == 0 and venv_dir ~= '' then
+                    return venv_dir .. '/bin/python'
+                end
+            end
+        end
+
         dapui.setup()
 
         -- IntelliJ-style gutter: a solid red dot for breakpoints, and the

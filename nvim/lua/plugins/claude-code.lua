@@ -160,6 +160,33 @@ end
 --- tab_name: replacing a diff cleans the old one up before opening the new.
 local floated = {}
 
+--- Jump a diff window to its first change and centre it -- floats otherwise
+--- open wherever the buffer's cursor already was, often nowhere near the edit.
+local function jump_to_hunk(win)
+    vim.api.nvim_win_call(win, function()
+        vim.cmd 'normal! gg'
+        pcall(vim.cmd, 'normal! ]c')
+        vim.cmd 'normal! zz'
+    end)
+end
+
+--- <C-n>/<C-p> already mean "next/prev change" for gitsigns hunks (git.lua);
+--- reuse that here, buffer-local so it only shadows the global expr maps
+--- while sitting in a diff pane. Buffers die with the diff, maps need no
+--- cleanup.
+local function hunk_nav(dir)
+    return function()
+        pcall(vim.cmd, 'normal! ' .. (dir == 'next' and ']c' or '[c'))
+        vim.cmd 'normal! zz'
+    end
+end
+
+local function bind_hunk_nav(win)
+    local buf = vim.api.nvim_win_get_buf(win)
+    vim.keymap.set('n', '<C-n>', hunk_nav 'next', { buffer = buf, desc = 'Next diff hunk' })
+    vim.keymap.set('n', '<C-p>', hunk_nav 'prev', { buffer = buf, desc = 'Prev diff hunk' })
+end
+
 --- The vertical layout puts the proposed file in a vsplit next to the original.
 --- Lift the proposed pane out as a float, mirror the original into a float
 --- beside it, and bring the Claude terminal under the pair.
@@ -185,6 +212,11 @@ local function float_diff(data)
     if boxes.claude then
         to_float(term, boxes.claude, ' Claude ')
     end
+
+    jump_to_hunk(original)
+    jump_to_hunk(proposed)
+    bind_hunk_nav(original)
+    bind_hunk_nav(proposed)
 
     floated[data.tab_name] = { original = original, term = term, widths = widths }
 end
@@ -235,9 +267,10 @@ return {
             -- The floats own the layout while a diff is up, so the plugin's
             -- split width juggling has nothing left to act on.
             auto_resize_terminal = false,
-            -- Land in the Claude terminal, where the accept/reject prompt is,
-            -- instead of in a diff pane.
-            keep_terminal_focus = true,
+            -- Land in the diff pane, not the terminal: the terminal is usually
+            -- in terminal-insert mode mid-conversation, so review keys
+            -- (<leader>aa/ad, hunk nav) would need a mode-escape first.
+            keep_terminal_focus = false,
         },
         terminal = {
             -- Same number the diff teardown restores, so the terminal is the
@@ -252,7 +285,6 @@ return {
         { '<leader>af', claude 'ClaudeCodeFocus', desc = 'Focus Claude' },
         { '<leader>ar', claude 'ClaudeCode --resume', desc = 'Resume Claude' },
         { '<leader>aC', claude 'ClaudeCode --continue', desc = 'Continue Claude' },
-        { '<leader>am', '<cmd>ClaudeCodeSelectModel<cr>', desc = 'Select Claude model' },
         { '<leader>ab', '<cmd>ClaudeCodeAdd %<cr>', desc = 'Add current buffer' },
         { '<leader>as', '<cmd>ClaudeCodeSend<cr>', mode = 'v', desc = 'Send to Claude' },
         {

@@ -59,6 +59,38 @@ local function conflict_qflist()
     vim.cmd.copen()
 end
 
+local function merge_main_win()
+    return require('diffview.lib').get_current_view().cur_layout:get_main_win()
+end
+
+--- jumpto_conflict only moves the cursor; centre it like the other change
+--- navigation in this config.
+local function goto_conflict(num, use_delta)
+    return function()
+        if require('diffview.actions').jumpto_conflict(num, use_delta) then
+            vim.api.nvim_win_call(merge_main_win().id, function()
+                vim.cmd 'normal! zz'
+            end)
+        end
+    end
+end
+
+--- diffview's 'all' also pastes the base section, which zdiff3 fills in.
+--- "Both" here is ours then theirs, as IntelliJ does it. Whole-file goes
+--- bottom-up so earlier replacements don't shift later line numbers.
+local function take_both(whole_file)
+    return function()
+        local main = merge_main_win()
+        local buf = main.file.bufnr
+        local conflicts, cur =
+            require('diffview.vcs.utils').parse_conflicts(vim.api.nvim_buf_get_lines(buf, 0, -1, false), main.id)
+        for _, c in ipairs(whole_file and vim.iter(conflicts):rev():totable() or { cur }) do
+            local both = vim.list_extend(vim.list_slice(c.ours.content or {}), c.theirs.content or {})
+            vim.api.nvim_buf_set_lines(buf, c.first - 1, c.last, false, both)
+        end
+    end
+end
+
 return {
     {
         'lewis6991/gitsigns.nvim',
@@ -101,7 +133,7 @@ return {
                 { 'n', '<leader>cA', false },
                 { 'n', 'cO', actions.conflict_choose_all 'ours', { desc = 'Conflict: take ours (file)' } },
                 { 'n', 'cT', actions.conflict_choose_all 'theirs', { desc = 'Conflict: take theirs (file)' } },
-                { 'n', 'cB', actions.conflict_choose_all 'all', { desc = 'Conflict: take both (file)' } },
+                { 'n', 'cB', take_both(true), { desc = 'Conflict: take both (file)' } },
             }
 
             local conflict_keys = vim.list_extend({
@@ -111,15 +143,31 @@ return {
                 { 'n', '<leader>ca', false },
                 { 'n', 'co', actions.conflict_choose 'ours', { desc = 'Conflict: take ours' } },
                 { 'n', 'ct', actions.conflict_choose 'theirs', { desc = 'Conflict: take theirs' } },
-                { 'n', 'cb', actions.conflict_choose 'all', { desc = 'Conflict: take both' } },
+                { 'n', 'cb', take_both(false), { desc = 'Conflict: take both' } },
                 { 'n', 'c0', actions.conflict_choose 'none', { desc = 'Conflict: take neither' } },
+                { 'n', '<C-n>', goto_conflict(1, true), { desc = 'Next conflict' } },
+                { 'n', '<C-p>', goto_conflict(-1, true), { desc = 'Previous conflict' } },
             }, whole_file_keys)
 
             return {
                 view = {
                     default = { layout = 'diff2_horizontal', winbar_info = true },
-                    merge_tool = { layout = 'diff3_mixed', disable_diagnostics = true, winbar_info = true },
+                    -- IntelliJ's arrangement: ours | result | theirs.
+                    merge_tool = { layout = 'diff3_horizontal', disable_diagnostics = true, winbar_info = true },
                     file_history = { layout = 'diff2_horizontal', winbar_info = true },
+                },
+                hooks = {
+                    -- Open each file on its first conflict. The hook re-fires on
+                    -- every refresh, so only jump when the window gets a new buffer.
+                    diff_buf_win_enter = function(bufnr, winid, ctx)
+                        if ctx.layout_name ~= 'diff3_horizontal' or ctx.symbol ~= 'b' then
+                            return
+                        end
+                        if vim.w[winid].conflict_buf ~= bufnr then
+                            vim.w[winid].conflict_buf = bufnr
+                            vim.schedule(goto_conflict(1))
+                        end
+                    end,
                 },
                 keymaps = {
                     view = conflict_keys,
